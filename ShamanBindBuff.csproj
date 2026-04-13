@@ -29,6 +29,6 @@
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	  <Exec Command="xcopy /y /d &quot;$(ProjectDir)bin\Debug\netstandard2.1\ShamanBindBuff.dll&quot; &quot;$(ProjectDir)thunderstore\BepInEx\plugins\&quot;" />
+	  <Exec Command="xcopy /y /d &quot;$(ProjectDir)bin\Debug\netstandard2.1\ShamanBindBuff.dll&quot; &quot;$(ProjectDir)thunderstore\&quot;" />
 	</Target>
 </Project>
