@@ -1,0 +1,11 @@
+D:\VS\ShamanBindBuff\ShamanBindBuff\bin\Debug\netstandard2.1\ShamanBindBuff.deps.json
+D:\VS\ShamanBindBuff\ShamanBindBuff\bin\Debug\netstandard2.1\ShamanBindBuff.dll
+D:\VS\ShamanBindBuff\ShamanBindBuff\bin\Debug\netstandard2.1\ShamanBindBuff.pdb
+D:\VS\ShamanBindBuff\ShamanBindBuff\obj\Debug\netstandard2.1\ShamanBindBuff.csproj.AssemblyReference.cache
+D:\VS\ShamanBindBuff\ShamanBindBuff\obj\Debug\netstandard2.1\MyPluginInfo.cs
+D:\VS\ShamanBindBuff\ShamanBindBuff\obj\Debug\netstandard2.1\ShamanBindBuff.GeneratedMSBuildEditorConfig.editorconfig
+D:\VS\ShamanBindBuff\ShamanBindBuff\obj\Debug\netstandard2.1\ShamanBindBuff.AssemblyInfoInputs.cache
+D:\VS\ShamanBindBuff\ShamanBindBuff\obj\Debug\netstandard2.1\ShamanBindBuff.AssemblyInfo.cs
+D:\VS\ShamanBindBuff\ShamanBindBuff\obj\Debug\netstandard2.1\ShamanBindBuff.csproj.CoreCompileInputs.cache
+D:\VS\ShamanBindBuff\ShamanBindBuff\obj\Debug\netstandard2.1\ShamanBindBuff.dll
+D:\VS\ShamanBindBuff\ShamanBindBuff\obj\Debug\netstandard2.1\ShamanBindBuff.pdb
