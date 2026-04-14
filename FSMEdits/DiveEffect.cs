@@ -25,8 +25,10 @@ namespace ShamanBindBuff.FSMEdits {
 			if(!(state.fsm.Name == "Bind" && state.Name == "Bind Ground"))
 				return;
 
-			Dive.SetActive(false);
-			DiveShockwave.SetActive(true);
+			if(Dive.activeSelf) {
+				Dive.SetActive(false);
+				DiveShockwave.SetActive(true);
+			}
 		}
 
 		internal static void SetupDive(HeroController hc) {
