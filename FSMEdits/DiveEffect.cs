@@ -1,22 +1,36 @@
 ﻿using GlobalSettings;
 using HutongGames.PlayMaker;
+using ShamanBindBuff.Components;
 using TeamCherry.SharedUtils;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace ShamanBindBuff.FSMEdits {
 	internal static class DiveEffect {
-		internal static GameObject DiveBurstFX, DiveBonkFX;
+		internal static GameObject DiveBurstFX, DiveBonkFX, BloomFX;
 		internal static GameObject Dive, DiveShockwave, DiveContainer;
 		internal static ToolItemSkill DiveTool;
+		internal static SpriteRenderer DiveBurstSprite;
+		internal static tk2dSprite DiveBonkSprite;
+		internal static ParticleSystem.EmissionModule ZapEmission;
+		internal static AudioFadeOut ZapFadeOut;
 
 		internal static void EnableAnimationAndDamager(FsmState state) {
 			if(!(state.fsm.Name == "Bind" && state.Name == "Shaman Impact"))
 				return;
 
 			Dive.SetActive(true);
+
+			Color color = Gameplay.ZapImbuementTool.IsEquipped ? Gameplay.ZapDamageTintColour : Color.white;
+			DiveBurstSprite.color = color;
+			DiveBonkSprite.color = color;
+
 			DiveBonkFX.SetActive(true);
 			DiveBurstFX.SetActive(true);
+			if(Gameplay.ZapImbuementTool.IsEquipped) {
+				ZapEmission.enabled = true;
+				ZapFadeOut.gameObject.SetActive(true);
+			}
 
 			HeroController.instance.parryInvulnTimer = 0.4f;
 		}
@@ -28,6 +42,8 @@ namespace ShamanBindBuff.FSMEdits {
 			if(Dive.activeSelf) {
 				Dive.SetActive(false);
 				DiveShockwave.SetActive(true);
+				ZapEmission.enabled = false;
+				ZapFadeOut.StartFadeout();
 			}
 		}
 
@@ -44,7 +60,7 @@ namespace ShamanBindBuff.FSMEdits {
 			DiveContainer.SetActive(true);
 
 			DiveBurstFX = hc.transform.FindIncludeInactive("Special Attacks/Silk Charge DashBurst").gameObject.Duplicate(false);
-			DiveBurstFX.name = "Dive FX";
+			DiveBurstFX.name = "Dive Burst FX";
 			DiveBurstFX.transform.localEulerAngles = new Vector3(0f, 0f, 90f);
 			DiveBurstFX.transform.localPosition = new Vector3(-0.17f, 5f, 0f);
 			DiveBurstFX.transform.GetChild(1).localPosition = new Vector3(0f, 0f, 0.003f);
@@ -52,7 +68,7 @@ namespace ShamanBindBuff.FSMEdits {
 			DiveBurstFX.transform.parent = DiveContainer.transform;
 
 			DiveBonkFX = hc.transform.FindIncludeInactive("Special Attacks/Silk Charge WallBonk").gameObject.Duplicate(true);
-			DiveBonkFX.name = "Shockwave FX";
+			DiveBonkFX.name = "Dive Bonk FX";
 			DiveBonkFX.transform.localEulerAngles = new Vector3(0f, 0f, 90f);
 			DiveBonkFX.transform.localPosition = new Vector3(0.125f, -0.7f, -0.008f);
 			DiveBonkFX.transform.localScale = Vector3.one;
@@ -78,13 +94,74 @@ namespace ShamanBindBuff.FSMEdits {
 			DisableAfterTime disableShockwave = DiveShockwave.AddComponent<DisableAfterTime>();
 			disableShockwave.waitTime = 0.2f;
 			disableShockwave.isRealtime = false;
+
+			BloomFX = hc.transform.FindIncludeInactive("Special Attacks/Silk Charge Damager/Shaman Rune/Shaman Rune Camera Bloom").gameObject.Duplicate(false);
+			BloomFX.name = "Bloom Effect";
+			BloomFX.transform.parent = DiveContainer.transform;
+			BloomFX.transform.localPosition = new Vector3(1, 0, -0.0017f);
+			DisableAfterTime disableBloomFX = BloomFX.AddComponent<DisableAfterTime>();
+			disableBloomFX.waitTime = 1.25f;
+			disableBloomFX.isRealtime = false;
+
+			SetupRuneEffect(Dive.AddComponent<HeroShamanRuneEffect>(), 
+				Dive.GetComponent<DamageEnemies>(),
+				BloomFX,
+				[ BloomFX.GetComponent<SpriteRenderer>() ]
+			);
+			SetupRuneEffect(
+				DiveShockwave.AddComponent<HeroShamanRuneEffect>(), 
+				DiveShockwave.GetComponent<DamageEnemies>() 
+			);
+
+			DiveBurstSprite = DiveBurstFX.transform.FindIncludeInactive("sprint_fall_dash_effect0002").GetComponent<SpriteRenderer>();
+			DiveBonkSprite = DiveBonkFX.GetComponent<tk2dSprite>();
+
+			GameObject zapParticles = hc.transform.FindIncludeInactive("Effects/Silk Charge Particles Zap").gameObject.Duplicate(true);
+			zapParticles.name = "Zap Particles";
+			zapParticles.transform.parent = DiveContainer.transform;
+			zapParticles.transform.localPosition = new Vector3(0, -0.57f, 0.056f);
+			ParticleSystem zapSystem = zapParticles.GetComponent<ParticleSystem>();
+			ZapEmission = zapSystem.emission;
+			ZapEmission.rateOverDistance = 0;
+			ZapEmission.rateOverTime = 100;
+			ParticleSystem.MainModule zapMain = zapSystem.main;
+			zapMain.playOnAwake = true;
+			zapMain.gravityModifier = 0;
+			ParticleSystem.MinMaxCurve zapStartSize = zapMain.startSize;
+			zapStartSize.constant = 3.2f;
+			ParticleSystem.MinMaxCurve zapStartSpeed = zapMain.startSpeed;
+			zapStartSpeed.constant = 3;
+			ParticleSystem.ShapeModule zapShape = zapSystem.shape;
+			zapShape.angle = 0;
+			zapShape.arc = 180;
+			zapShape.radius = 2.6f;
+			zapShape.shapeType = ParticleSystemShapeType.Hemisphere;
+
+			GameObject zapSFX = hc.transform.FindIncludeInactive("Special Attacks/Sphere Ball/Ball/thread_sphere_effect_zap/Zap Loop").gameObject.Duplicate(false);
+			zapSFX.name = "Zap Loop";
+			zapSFX.transform.parent = DiveContainer.transform;
+			zapSFX.transform.localPosition = Vector3.zero;
+			zapSFX.GetComponent<AudioSource>().pitch = 1.2f;
+			ZapFadeOut = zapSFX.AddComponent<AudioFadeOut>();
+			ZapFadeOut.FadeSpeedMultiplier = 3f;
+		}
+
+		private static void SetupRuneEffect(HeroShamanRuneEffect runeEffect, DamageEnemies damager, GameObject rune = null, SpriteRenderer[] runeSprites = null) {
+			runeEffect.damager = damager;
+			runeEffect.rune = rune;
+			runeEffect.zapTintSprites = [];
+			runeEffect.zapTintParticles = [];
+
+			if(runeSprites != null) {
+				runeEffect.zapTintSprites.AddRange(runeSprites);
+			}
 		}
 
 		private static void SetupDamager(DamageEnemies dmg, float mult) {
-			dmg.attackType = AttackTypes.Spell;
+			dmg.attackType = AttackTypes.Heavy;
 			dmg.useNailDamage = true;
 			dmg.nailDamageMultiplier = mult;
-			dmg.damageMultiplier = Gameplay.SpellCrestRuneDamageMult;
+			dmg.damageMultiplier = 1; // Gameplay.SpellCrestRuneDamageMult
 			dmg.representingTool = DiveTool;
 			dmg.slashEffectOverrides = [];
 			dmg.damageFSMEvent = string.Empty;
