@@ -1,5 +1,8 @@
 # Shaman Dive Bind 
 
+## v1.1.1
+- Fixed incorrect version number in csproj file 
+
 ## v1.1.0 
 - Added Volt Filament particles and audio to the dive shockwave when equipped 
 - Volt Filament now recolors the dive sprites when equipped 

@@ -1,7 +1,7 @@
 {
 	"name": "ShamanDiveBind",
 	"description": "Makes the Shaman Crest bind function more similarly to Desolate Dive.",
-	"version_number": "1.1.0",
+	"version_number": "1.1.1",
 	"dependencies": [ "silksong_modding-I18N-1.0.3", "silksong_modding-FsmUtil-0.3.16", "BepInEx-BepInExPack_Silksong-5.4.2304" ],
 	"website_url": "https://github.com/Tetriscat66/Silksong.ShamanBindBuff"
 }
